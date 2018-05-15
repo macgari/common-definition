@@ -28,11 +28,7 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
  
  - 250GB of disk space
  - MySQL server instance
-   - username and password would need to be updated in nih.sql.sh script
-   - read details in nih.sql.sh
-
- - PostgreSQL server instance
-   - omop
+   - username and password would need to be updated in nih.sql.sh, ohdsi.sh scripts
 
 
 
@@ -56,14 +52,22 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
    - ohdsi.constraints.sh _disabled due to errors and its insignificance_
 
 
+### Running the pipeline
 
-### Configs
+- Different components can run individually or as a group in parallel
+- cdi.sh runs all components in parallel, but prameters need to be loaded
+- Individual components can be run, with arguments, as follows
+  - sh umls.nlm.sh nih_username nih_password "https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip" mysql_username mysql_password
+  - sh nci.rrf.sh nih_username nih_password mysql_username mysql_password
+  - sh ohdsi.sh mysql_username mysql_password "/path/to/ohdsi/archive.zip"
+
+
+
+### Configurations notes
 
  Some configurations have dependencies on the environment in which the pipeline is running
   - NIH Account is needed, the same account will be used to pull UMLS and NCI data
-  - nih.sql.sh needs to be updated with the MySQL server password
-  - Depending on OS, in umls.nlm.sh and nci.rrf.sh, the criage return needs to be updated for this parameter OSX_SED="s/\\\r\\\n/\\\n/g"      
-  - ohdsi.sh accesses a postgresql instance, a superuser is assumed responsibility, no password needed
+  - Depending on the OS, in umls.nlm.sh and nci.rrf.sh, the criage return needs to be updated for this parameter OSX_SED="s/\\\r\\\n/\\\n/g"      
 
 
 #### _CURLing with SSL_

@@ -25,19 +25,19 @@
 
 ROOT=$1
 DB=$2
-if [ $# -lt 2 ]; then echo "         Usage:                                     " 
-                      echo "         ./nih.sql.sh META_Directory NIH_DATABASE   "
-                      echo "                                                    "  
-		              echo "         ./nih.sql.sh /usr/data2017AB-full/META umls"
-                      echo "         ./nih.sql.sh /usr/data/nci/META nci        "                      
+if [ $# -ne 4 ]; then echo "         Usage:                                                                   " 
+                      echo "         ./nih.sql.sh META_Directory NIH_DATABASE mysql_username mysql_password "
+                      echo "                                                                                  "  
+		              echo "         ./nih.sql.sh /usr/data2017AB-full/META umls mysql_username mysql_password"
+                      echo "         ./nih.sql.sh  /usr/data/nci/META nci mysql_username mysql_password"                      
    exit
 fi
 
 
 cd $ROOT
 MYSQL_HOME=$MYSQL_HOME
-USER=root
-PASS=root
+USER=$3
+PASS=$4
 
 rm -f mysql.log
 touch mysql.log
