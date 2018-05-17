@@ -16,13 +16,10 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
 
 ### Sources 
  - NIH
-   - umls -- functional
-   - nci -- functional
- - ohsdi -- functional 
- - msk ontology -- TopBraid -- in spike
-
-
-
+   - umls
+   - nci
+ - ohsdi
+ - evn
 
 ### Prerequisits
  
@@ -51,6 +48,9 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
    - ohdsi.indexes.sh
    - ohdsi.constraints.sh _disabled due to errors and its insignificance_
 
+ - evn.sh
+   - evn.download.sh
+
 
 ### Running the pipeline
 
@@ -60,12 +60,14 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
   - sh umls.nlm.sh nih_username nih_password "https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip" mysql_username mysql_password
   - sh nci.rrf.sh nih_username nih_password mysql_username mysql_password
   - sh ohdsi.sh mysql_username mysql_password "/path/to/ohdsi/archive.zip"
+  - sh evn.sh evn_username evn_password mysql_username mysql_password
 
 
 
 ### Configurations notes
 
  Some configurations have dependencies on the environment in which the pipeline is running
+  - $MYSQL_HOME needs to be setup correctly in .profile, .bashrc, .bash_profile, etc i.e export MYSQL_HOME=/path/to/mysql/command
   - NIH Account is needed, the same account will be used to pull UMLS and NCI data
   - Depending on the OS, in umls.nlm.sh and nci.rrf.sh, the criage return needs to be updated for this parameter OSX_SED="s/\\\r\\\n/\\\n/g"      
 

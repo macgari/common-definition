@@ -1,27 +1,5 @@
 #!/bin/sh -f
 #
-# For useful information on loading your Metathesaurus subset
-# into a MySQL database, please consult the on-line
-# documentation at:
-#
-# http://www.nlm.nih.gov/research/umls/load_scripts.html
-#
-
-#
-# Database connection parameters
-# Please edit these variables to reflect your environment
-#
-
-# Note to MySQL users implementing MySQL version 5.6:
-# MySQL version 5.6 and above defaults to use the InnoDB storage engine. Users have reported disk space issues while 
-# loading RRF data into MySQL 5.6 databases due to default InnoDB settings that store all tables and indexes within the 
-# system tablespace. MySQL 5.6.6 now sets the 'innodb_file_per_table' configuration setting to 'on' so that each newly 
-# created table and index are assigned a separate .idb data file. Users should read the MySQL documentation for 
-# additional information.
-
-# this setup assuems that a passowrd is not setup on the server
-# if one is; then will need to pass it to $MYSQL_HOME/bin/mysql as -p $password
-# if one is not set up it would have to be removed
 
 ROOT=$1
 DB=$2
@@ -35,6 +13,7 @@ fi
 
 
 cd $ROOT
+
 MYSQL_HOME=$MYSQL_HOME
 USER=$3
 PASS=$4

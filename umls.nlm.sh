@@ -8,7 +8,7 @@ if [ $# -ne 5 ]; then echo "         Usage:                                     
                       echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip mysql_username mysql_password" 
    exit
 fi
-chmod 775 *sh
+
 START=$(date -u +%s)
 
 # determine OS windows/linux/macos, could be parameterized or automated but for now as is
@@ -54,11 +54,11 @@ DIRECTORY_NAME="${FILE_NAME%.*}"
 #
 EXTRACT_DIRECTORY=$ROOT/$DIRECTORY_NAME
 
-echo "clean up previous space @ " $EXTRACT_DIRECTORY
+# echo "clean up previous space @ " $EXTRACT_DIRECTORY
 rm -rf $EXTRACT_DIRECTORY
 mkdir $EXTRACT_DIRECTORY
 
-echo "extract $FILE_NAME @ " $EXTRACT_DIRECTORY
+# echo "extract $FILE_NAME @ " $EXTRACT_DIRECTORY
 tar xzf $FILE_NAME --strip 1  --directory $EXTRACT_DIRECTORY
 
 

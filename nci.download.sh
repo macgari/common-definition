@@ -3,8 +3,8 @@
 NCI_USERNAME=$1
 NCI_PASSWORD=$2
 
-if [ $# -lt 2 ]; then echo "         Usage:  use NIH authentication                         "
-                      echo "         ./nci.download.sh nih-username nih-password            "
+if [ $# -ne 2 ]; then echo "  Usage:  use NIH authentication                         "
+                      echo "         ./nci.download.sh nih-username nih-password     "
    exit
 fi
 

@@ -14,7 +14,7 @@ COOKIE_FILE=nih.cookie.txt
 NLM_CACERT=nih.gov.crt
 
 
-if [ $# -lt 3 ]; then echo "         Usage:                                                                                                            "
+if [ $# -ne 3 ]; then echo "         Usage:                                                                                                            "
                       echo "         umls.download.sh nih-username nih-password download_url                                                            "
                       echo "                                                                                                                           "
                       echo "         umls.download.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip  "
