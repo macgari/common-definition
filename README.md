@@ -27,8 +27,6 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
  - MySQL server instance
    - username and password would need to be updated in nih.sql.sh, ohdsi.sh scripts
 
-
-
 ### Scripts
 
  There are two main scripts [umls.nlm.sh, and nci.rrf.sh] that process [ umls, and nci ] resplectively. 
@@ -70,6 +68,31 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
   - $MYSQL_HOME needs to be setup correctly in .profile, .bashrc, .bash_profile, etc i.e export MYSQL_HOME=/path/to/mysql/command
   - NIH Account is needed, the same account will be used to pull UMLS and NCI data
   - Depending on the OS, in umls.nlm.sh and nci.rrf.sh, the criage return needs to be updated for this parameter OSX_SED="s/\\\r\\\n/\\\n/g"      
+
+
+
+### Links
+
+  - NIH
+   
+   - UMLS
+    - https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip
+    - _update is released twice a year, use new link when available_
+
+   - NCI
+    - https://cbiit.cancer.gov/evs-download/download/UTSServlet
+    - https://cbiit.cancer.gov/evs-download/download/UMLSServlet
+    - _Supposedly will not change, will always point to latest nci_
+
+  - OHDSI
+    - http://athena.ohdsi.org/vocabulary/list
+    - https://github.com/OHDSI/Vocabulary-v5.0
+    - _Manual process, download zip, save to a local path, and use in pipeline_ 
+
+  - EVN
+    - https://evn.mskcc.org/evn/tbl/sparql
+    - _Concepts are always pulled from the latest graph, however mappings are pulled from a graph that is renamed once a month_
+
 
 
 #### _CURLing with SSL_
