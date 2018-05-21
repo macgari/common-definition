@@ -1,23 +1,26 @@
 #!/bin/sh -f
 #
 
-ROOT=$1
-DB=$2
-if [ $# -ne 4 ]; then echo "         Usage:                                                                   " 
-                      echo "         ./nih.sql.sh META_Directory NIH_DATABASE mysql_username mysql_password "
+if [ $# -ne 6 ]; then echo "         Usage:                                                                   						" 
+                      echo "         ./nih.sql.sh META_Directory NIH_DATABASE mysql_username mysql_password mysql_host mysql_port "
                       echo "                                                                                  "  
-		              echo "         ./nih.sql.sh /usr/data2017AB-full/META umls mysql_username mysql_password"
-                      echo "         ./nih.sql.sh  /usr/data/nci/META nci mysql_username mysql_password"                      
+		              echo "         ./nih.sql.sh /usr/data2017AB-full/META umls mysql_username mysql_password mysql_host mysql_port "
+                      echo "         ./nih.sql.sh  /usr/data/nci/META nci mysql_username mysql_password  mysql_host mysql_port "                      
    exit
 fi
 
 
-cd $ROOT
+
 
 MYSQL_HOME=$MYSQL_HOME
+ROOT=$1
+DB=$2
 USER=$3
 PASS=$4
+HOST=$5
+PORT=$6
 
+cd $ROOT
 rm -f mysql.log
 touch mysql.log
 ef=0
@@ -39,21 +42,21 @@ if [ ! -f MRCXT.RRF ]; then `touch MRCXT.RRF`; fi
 
 
 echo "    Create database $DB if not created  ... `/bin/date`" >> mysql.log 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e "CREATE DATABASE IF NOT EXISTS $DB /*!40100 DEFAULT CHARACTER SET utf8 */;" >> mysql.log 2>&1
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -h$HOST -P$PORT -e "CREATE DATABASE IF NOT EXISTS $DB /*!40100 DEFAULT CHARACTER SET utf8 */;" >> mysql.log 2>&1
 if [ $? -ne 0 ]; then ef=1; fi
 
 echo "finished creating $DB database ... `/bin/date`" >> mysql.log 2>&1
 
 
 echo "    Create and load tables ... `/bin/date`" >> mysql.log 2>&1
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  $DB < mysql_tables_os.sql >> mysql.log 2>&1
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT $DB < mysql_tables_os.sql >> mysql.log 2>&1
 if [ $? -ne 0 ]; then ef=1; fi
 
 echo "finished loading tables ... `/bin/date`" >> mysql.log 2>&1
 
 
 echo "    Create indexes ... `/bin/date`" >> mysql.log 2>&1
-$MYSQL_HOME/bin/mysql -vvv  --local-infile -u $USER  -p$PASS  $DB < mysql_indexes_os.sql >> mysql.log 2>&1
+$MYSQL_HOME/bin/mysql -vvv  --local-infile -u $USER  -p$PASS  -h$HOST -P$PORT  $DB < mysql_indexes_os.sql >> mysql.log 2>&1
 if [ $? -ne 0 ]; then ef=1; fi
 
 
@@ -63,7 +66,7 @@ if [ $mrcxt_flag -eq 1 ]
 then
 rm -f MRCXT.RRF
 echo "DROP TABLE IF EXISTS MRCXT;" >> drop_mrcxt.sql
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS $DB < drop_mrcxt.sql >> mysql.log 2>&1
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT  $DB < drop_mrcxt.sql >> mysql.log 2>&1
 if [ $? -ne 0 ]; then ef=1; fi
 rm -f drop_mrcxt.sql
 fi

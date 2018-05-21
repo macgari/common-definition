@@ -4,10 +4,10 @@
 # if one is; then will need to pass it to $MYSQL_HOME/bin/mysql as -p $password
 # if one is not set up it would have to be removed
 
-if [ $# -ne  4 ]; then echo "         Usage:                                             						" 
-                      echo "         ./evn.sh evn_username evn_password mysql_username mysql_password       "
-                      echo "                                                            					"  
-             		  echo "         ./evn.sh evn_username evn_password mysql_username mysql_password 		"
+if [ $# -ne  6 ]; then echo "         Usage:                                             						" 
+                       echo "         ./evn.sh evn_username evn_password mysql_username mysql_password mysql_host mysql_port      "
+                       echo "                                                            					"  
+             		   echo "         ./evn.sh evn_username evn_password mysql_username mysql_password mysql_host mysql_port		"
                      
    exit
 fi
@@ -19,6 +19,8 @@ EVN_USER=$1
 EVN_PASS=$2
 USER=$3
 PASS=$4
+HOST=$5
+PORT=$6
 EXTRACT_DIRECTORY=$ROOT/$DB
 
 echo "Extract files"
@@ -45,7 +47,7 @@ echo "DB =    $DB" >> $LOG 2>&1
 
 
 echo "    Create $DB database ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u$USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u$USER -p$PASS -h$HOST -P$PORT -e " \
 CREATE DATABASE IF NOT EXISTS ${DB} /*!40100 DEFAULT CHARACTER SET utf8 */; \
 show warnings \
 " >> $LOG 2>&1
@@ -54,15 +56,15 @@ echo "finished creating $DB database... `/bin/date`" >> $LOG 2>&1
 
 #Creating concept(concept_id,prefLabel,altLabel,broader,narrower_concept_id)
 echo "    Create concept table  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -h$HOST -P$PORT -e " \
 DROP TABLE IF EXISTS ${DB}.concept; \
 \
 CREATE TABLE ${DB}.concept ( \
-	concept_id 			VARCHAR(25) NULL, \
+	concept_id 			VARCHAR(25)  NULL, \
 	prefLabel 			VARCHAR(255) NULL, \
 	altLabel	   		VARCHAR(255) NULL, \
-	broader 			VARCHAR(25) NULL, \
-	narrower_concept_id VARCHAR(25) NULL); \
+	broader 			VARCHAR(25)  NULL, \
+	narrower_concept_id VARCHAR(25)  NULL); \
 show warnings \
 " >> $LOG 2>&1
 if [ $? -ne 0 ]; then ef=1; fi	
@@ -70,7 +72,7 @@ echo "finished creating  concept table... `/bin/date`" >> $LOG 2>&1
 
 
 echo "    Loading concept table  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT -e " \
 load data local infile '${EXTRACT_DIRECTORY}/concept.csv' into table ${DB}.concept FIELDS TERMINATED BY  ','ESCAPED BY '\"' LINES TERMINATED BY '\n' IGNORE 1 LINES \
 (@concept_id,@prefLabel,@altLabel,@broader,@narrower_concept_id) \
 SET \
@@ -85,7 +87,7 @@ if [ $? -ne 0 ]; then ef=1; fi
 echo "finished loading concept table... `/bin/date`" >> $LOG 2>&1
 
 echo "    Indexing table(s)  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT -e " \
 CREATE INDEX idx_concept_id  ON ${DB}.concept  (concept_id ASC); \
 CREATE INDEX idx_prefLabel ON ${DB}.concept (prefLabel ASC); \
 CREATE INDEX idx_altLabel ON ${DB}.concept (altLabel ASC); \
@@ -99,7 +101,7 @@ echo "finished indexing concept table ... `/bin/date`" >> $LOG 2>&1
 
 #Creating mapping(msk_id,oncotree_id)
 echo "    Create mapping table  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT -e " \
 DROP TABLE IF EXISTS ${DB}.mapping; \
 \
 CREATE TABLE ${DB}.mapping ( \
@@ -112,7 +114,7 @@ echo "finished creating  mapping table... `/bin/date`" >> $LOG 2>&1
 
 
 echo "    Loading mapping table  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 load data local infile '${EXTRACT_DIRECTORY}/mapping.csv' into table ${DB}.mapping FIELDS TERMINATED BY  ',' LINES TERMINATED BY '\n' IGNORE 1 LINES \
 (@msk_id,@oncotree_id) \
 SET \
@@ -124,7 +126,7 @@ if [ $? -ne 0 ]; then ef=1; fi
 echo "finished loading mapping table... `/bin/date`" >> $LOG 2>&1
 
 echo "    Indexing table(s)  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT -e " \
 CREATE INDEX idx_msk_id  ON ${DB}.mapping  (msk_id ASC); \
 CREATE INDEX idx_oncotree_id ON ${DB}.mapping (oncotree_id ASC); \
 

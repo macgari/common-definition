@@ -1,7 +1,7 @@
 #!/bin/sh -f
 
-if [ $# -ne 4 ]; then echo "         Usage:                                                                                                            " 
-                      echo "         ./nci.rrf.sh nih-username nih-password mysql_username mysql_password                                                          "
+if [ $# -ne 6 ]; then echo "         Usage:                                                                                                            " 
+                      echo "         ./nci.rrf.sh nih-username nih-password mysql_username mysql_password  mysql_password mysql_host mysql_port                                                             "
    exit
 fi
 
@@ -57,7 +57,7 @@ cp $MYSQL_INDEXES $META_DIRECTORY/mysql_indexes_os.sql
 # Load RRF files into MySQL
 #
 echo "Load RRFs into MySQL"
-sh $ROOT/nih.sql.sh $META_DIRECTORY nci $3 $4
+sh $ROOT/nih.sql.sh $META_DIRECTORY nci $3 $4 $5 $6
 
 cat $META_DIRECTORY/mysql.log
 

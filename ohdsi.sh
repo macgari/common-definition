@@ -6,10 +6,10 @@
 
 ROOT=.
 DB=OHDSI
-if [ $# -ne 3 ]; then echo "         Usage:                                                          " 
-                      echo "         ./ohdsi.sh mysql_username mysql_password ohdsi_vocabularies.zip       				"
+if [ $# -ne 5 ]; then echo "         Usage:                                                          " 
+                      echo "         ./ohdsi.sh mysql_username mysql_password mysql_password mysql_host mysql_port ohdsi_vocabularies.zip       				"
                       echo "                                                                "  
-             		  echo "         ./ohdsi.sh mysql_username mysql_password /path/to/ohdsi/vocabulary/archive.zip 		"
+             		  echo "         ./ohdsi.sh mysql_username mysql_password mysql_password mysql_host mysql_port /path/to/ohdsi/vocabulary/archive.zip 		"
                      
    exit
 fi
@@ -18,12 +18,15 @@ fi
 MYSQL_HOME=$MYSQL_HOME
 USER=$1
 PASS=$2
+HOST=$3
+PORT=$4
+FILE_NAME=$5
 
 echo "Extract files"
 # extract file name from url: umls-2017AB-full.zip
 # and extract directory name from file name: umls-2017AB-full
 #
-FILE_NAME=$3
+
 
 
 # extract unzipped directory name from file name: umls-2017AB-full
@@ -56,7 +59,7 @@ echo "DB =    $DB" >> $LOG 2>&1
 
 
 echo "    Create $DB database ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u$USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u$USER -p$PASS  -h$HOST -P$PORT -e " \
 CREATE DATABASE IF NOT EXISTS ${DB} /*!40100 DEFAULT CHARACTER SET utf8 */; \
 show warnings \
 " >> $LOG 2>&1
@@ -65,7 +68,7 @@ echo "finished creating $DB database... `/bin/date`" >> $LOG 2>&1
 
 
 echo "    Create concept table  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -h$HOST -P$PORT -e " \
 DROP TABLE IF EXISTS ${DB}.concept; \
 \
 CREATE TABLE ${DB}.concept ( \
@@ -86,7 +89,7 @@ echo "finished creating  table(s)... `/bin/date`" >> $LOG 2>&1
 
 
 echo "    Loading table(s)  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS -h$HOST -P$PORT -e " \
 load data local infile '${EXTRACT_DIRECTORY}/CONCEPT.csv' into table ${DB}.concept FIELDS TERMINATED BY  '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES \
 (@concept,@concept_name,@domain_id,@vocabulary_id,@concept_class_id,@standard_concept,@concept_code,@valid_start_date,@valid_end_date,@invalid_reason) \
 SET \
@@ -106,7 +109,7 @@ if [ $? -ne 0 ]; then ef=1; fi
 echo "finished loading table(s)... `/bin/date`" >> $LOG 2>&1
 
 echo "    Indexing table(s)  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -e " \
+$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS -h$HOST -P$PORT -e " \
 CREATE INDEX idx_concept_concept_id  ON ${DB}.concept  (concept ASC); \
 CREATE INDEX idx_concept_code ON ${DB}.concept (concept_code ASC); \
 CREATE INDEX idx_concept_name ON ${DB}.concept (concept_Name ASC); \

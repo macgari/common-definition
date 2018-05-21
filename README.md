@@ -2,7 +2,7 @@
 
 
 ### Overview
-This pipeline gathers and combines health/medical concepts and terminologies from multiple sources. 
+This pipeline gathers medical concepts, vocabularies, and terminologies from multiple sources. 
 One of the main sources is NIH where concepts come from UMLS and NCI. 
 NIH provides data in ths form of binary (files.nlm) files. 
 Then NIH provides a system called Metamorphysis which extracts and subsets data into a psv files (files.rrf). 
@@ -11,7 +11,6 @@ The typical etl cycle for umls is: umls.nlm -> umls-subset.rrf -> MySQL UMLS dat
 The typical etl cycle for nci is: umls.rrf -> (optional) nci.rrf -> MySQL NCI database.
 Notice the difference in sources where UMLS provides sources ans .nlm while NCI provides sources as .rrf. 
 Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) files as a source, therefore subsetting is not accomplished during load, however it could be accomplished when querying the nci database.  
-
 
 
 ### Sources 
@@ -23,7 +22,7 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
 
 ### Prerequisits
  
- - 250GB of disk space
+ - Nearly 300 GB of storage
  - MySQL server instance
    - username and password would need to be updated in nih.sql.sh, ohdsi.sh scripts
 
@@ -55,19 +54,19 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
 - Different components can run individually or as a group in parallel
 - cdi.sh runs all components in parallel, but prameters need to be loaded
 - Individual components can be run, with arguments, as follows
-  - sh umls.nlm.sh nih_username nih_password "https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip" mysql_username mysql_password
-  - sh nci.rrf.sh nih_username nih_password mysql_username mysql_password
-  - sh ohdsi.sh mysql_username mysql_password "/path/to/ohdsi/archive.zip"
-  - sh evn.sh evn_username evn_password mysql_username mysql_password
+  - sh umls.nlm.sh nih_username nih_password "https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip" mysql_username mysql_password mysql_host mysql_port
+  - sh nci.rrf.sh nih_username nih_password mysql_username mysql_password mysql_host mysql_port
+  - sh ohdsi.sh mysql_username mysql_password mysql_host mysql_port "/path/to/ohdsi/archive.zip"
+  - sh evn.sh evn_username evn_password mysql_username mysql_password mysql_host mysql_port
 
 
 
-### Configurations notes
+### Notes on Configuration
 
  Some configurations have dependencies on the environment in which the pipeline is running
-  - $MYSQL_HOME needs to be setup correctly in .profile, .bashrc, .bash_profile, etc i.e export MYSQL_HOME=/path/to/mysql/command
+  - $MYSQL_HOME needs to be setup correctly in _.profile_, _.bashrc_, _.bash_profile_, etc i.e export MYSQL_HOME=/path/to/mysql/command
   - NIH Account is needed, the same account will be used to pull UMLS and NCI data
-  - Depending on the OS, in umls.nlm.sh and nci.rrf.sh, the criage return needs to be updated for this parameter OSX_SED="s/\\\r\\\n/\\\n/g"      
+  - Depending on the OS, the criage return needs to be updated for this parameter OSX_SED="s/\\\r\\\n/\\\n/g" in umls.nlm.sh and nci.rrf.sh      
 
 
 

@@ -1,11 +1,10 @@
 #!/bin/sh -f
 
-if [ $# -ne 5 ]; then echo "         Usage:                                                                                                            " 
-                      echo "         ./umls.nlm.sh nih-username nih-password download_URL mysql_username mysql_password                                                          "
+if [ $# -ne 7 ]; then echo "         Usage:                                                                                                            " 
+                      echo "         ./umls.nlm.sh nih-username nih-password download_URL mysql_username mysql_password mysql_host mysql_port                                                          "
                       echo "                                                                                                                           "  
-		              echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip  mysql_username mysql_password"
-                      echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_weekly_current.zip mysql_username mysql_password"
-                      echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip mysql_username mysql_password" 
+		              echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip mysql_username mysql_password  mysql_host mysql_port " 
+
    exit
 fi
 
@@ -54,11 +53,11 @@ DIRECTORY_NAME="${FILE_NAME%.*}"
 #
 EXTRACT_DIRECTORY=$ROOT/$DIRECTORY_NAME
 
-# echo "clean up previous space @ " $EXTRACT_DIRECTORY
+echo "clean up previous space @ " $EXTRACT_DIRECTORY
 rm -rf $EXTRACT_DIRECTORY
 mkdir $EXTRACT_DIRECTORY
 
-# echo "extract $FILE_NAME @ " $EXTRACT_DIRECTORY
+echo "extract $FILE_NAME @ " $EXTRACT_DIRECTORY
 tar xzf $FILE_NAME --strip 1  --directory $EXTRACT_DIRECTORY
 
 
@@ -102,7 +101,7 @@ cp $META_DIRECTORY/mysql_indexes.sql  $META_DIRECTORY/mysql_indexes_os.sql
 # Load RRF files into MySQL
 #
 echo "Load RRFs into MySQL"
-sh $ROOT/nih.sql.sh $META_DIRECTORY umls $4 $5
+sh $ROOT/nih.sql.sh $META_DIRECTORY umls $4 $5 $6 $7
 
 cat $META_DIRECTORY/mysql.log
 
