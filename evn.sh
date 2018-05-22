@@ -73,7 +73,7 @@ echo "finished creating  concept table... `/bin/date`" >> $LOG 2>&1
 
 echo "    Loading concept table  ... `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT -e " \
-load data local infile '${EXTRACT_DIRECTORY}/concept.csv' into table ${DB}.concept FIELDS TERMINATED BY  ','ESCAPED BY '\"' LINES TERMINATED BY '\n' IGNORE 1 LINES \
+load data local infile '${EXTRACT_DIRECTORY}/concept.csv' into table ${DB}.concept FIELDS TERMINATED BY  ','ESCAPED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES \
 (@concept_id,@prefLabel,@altLabel,@broader,@narrower_concept_id) \
 SET \
 	concept_id = NULLIF(@concept_id,''), \
@@ -115,7 +115,7 @@ echo "finished creating  mapping table... `/bin/date`" >> $LOG 2>&1
 
 echo "    Loading mapping table  ... `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
-load data local infile '${EXTRACT_DIRECTORY}/mapping.csv' into table ${DB}.mapping FIELDS TERMINATED BY  ',' LINES TERMINATED BY '\n' IGNORE 1 LINES \
+load data local infile '${EXTRACT_DIRECTORY}/mapping.csv' into table ${DB}.mapping FIELDS TERMINATED BY  ',' LINES TERMINATED BY '\r\n' IGNORE 1 LINES \
 (@msk_id,@oncotree_id) \
 SET \
 	msk_id = NULLIF(@msk_id,''), \
