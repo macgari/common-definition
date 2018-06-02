@@ -4,7 +4,7 @@
 if [ $# -ne 6 ]; then echo "         Usage:                                                                   						" 
                       echo "         ./nih.sql.sh META_Directory NIH_DATABASE mysql_username mysql_password mysql_host mysql_port "
                       echo "                                                                                  "  
-		              echo "         ./nih.sql.sh /usr/data2017AB-full/META umls mysql_username mysql_password mysql_host mysql_port "
+		              echo "         ./nih.sql.sh /usr/data2018AA-full/META umls mysql_username mysql_password mysql_host mysql_port "
                       echo "         ./nih.sql.sh  /usr/data/nci/META nci mysql_username mysql_password  mysql_host mysql_port "                      
    exit
 fi

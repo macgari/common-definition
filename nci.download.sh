@@ -8,7 +8,7 @@ if [ $# -ne 2 ]; then echo "  Usage:  use NIH authentication                    
    exit
 fi
 
-ROOT=$(pwd)
+ROOT=${PWD}
 NCI_FILE=$ROOT/nci.zip
 
 

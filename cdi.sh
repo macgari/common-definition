@@ -1,7 +1,7 @@
 #!/bin/sh -f
 
 ###############################################################
-##### Home for processing umls and nci pipelines          #####
+##### Home for processing umls, nci, ohdsi, evn pipelines #####
 #####  - runs umls, nci, ohdsi, evn pipelines in parallel #####
 ###############################################################
 
@@ -25,16 +25,20 @@ MYSQL_PASS=$mysql_tlvdpcvsdev1_password # *******
 EVN_USERNAME=$evn_username 
 EVN_PASSWORD=$evn_password
 
+# Transformation database, arbitrary database name, where all transformations occure, 
+# any unique name should be ok 
+# This is a staging database, to be deleted after loading, and potentially debugging
+TRANSFORMATION_DATABASE=trans
+
 #needs a new url twice a year
-UMLS_URL=https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip
+UMLS_URL=https://download.nlm.nih.gov/umls/kss/2018AA/umls-2018AA-full.zip
 
 #needs to be downloaded manually and saved in a known path
 OHDSI_ZIP=ohdsi-vocab.zip
 
-chmod 775 *sh
-
 echo "Processing UMLS..."
-# example: sh umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip  $mysql_username $mysql_password localhost 3306
+                                                    
+# example: sh umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2018AA/umls-2018AA-full.zip  $mysql_username $mysql_password localhost 3306
 # stats: ~4.5GB, ~5 hours
 sh umls.nlm.sh $NIH_USER $NIH_PASS $UMLS_URL $MYSQL_USER $MYSQL_PASS $MYSQL_HOST $MYSQL_PORT &
 
@@ -46,13 +50,28 @@ sh nci.rrf.sh $NIH_USER $NIH_PASS $MYSQL_USER $MYSQL_PASS $MYSQL_HOST $MYSQL_POR
 
 ##### Needs ohdsi archive (archive.zip)
 # example sh ohdsi.sh $mysql_username $mysql_password localhost 3306 ohdsi-vocab.zip 
-# stats: ~ 5419532 records, ~ 10 miuntes
+# stats: ~ 5419532 records, ~ 10 min
 echo "Processing OHDSI..."
 sh ohdsi.sh $MYSQL_USER $MYSQL_PASS $MYSQL_HOST $MYSQL_PORT $OHDSI_ZIP &
 
 # example: sh evn.sh $evn_username $evn_password $mysql_username $mysql_password localhost 3306
-# stats: ~600 recods, ~2 second
+# stats: ~600 records, ~2 second
 echo "Processing EVN..."
 sh evn.sh $EVN_USERNAME $EVN_PASSWORD $MYSQL_USER $MYSQL_PASS $MYSQL_HOST $MYSQL_PORT &
 
 wait
+
+
+##### Transformation process
+# example ./trans.sh user pass localhost 3306 trans 
+# stats: ~ 4492052 records, ~ 80 min
+./trans.sh $MYSQL_HOST $MYSQL_PORT $MYSQL_USER $MYSQL_PASS $TRANSFORMATION_DATABASE
+
+
+##### Load process
+# example ./load.sh  trans/trans.json
+# Note: trans is the arbitrary database name, the last argument used in the previous step [ $TRANSFORMATION_DATABASE ] 
+# stats: ~ 4,492,052 records, ~ 40 min
+./load.sh $TRANSFORMATION_DATABASE/$TRANSFORMATION_DATABASE.json
+
+

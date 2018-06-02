@@ -19,7 +19,7 @@ if [ $# -ne 3 ]; then echo "         Usage:                                     
                       echo "                                                                                                                           "
                       echo "         umls.download.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_current.zip  "
                       echo "         umls.download.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_weekly_current.zip"
-                      echo "         umls.download.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip     "
+                      echo "         umls.download.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2018AA/umls-2018AA-full.zip     "
    exit
 fi
 

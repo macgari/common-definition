@@ -1,15 +1,15 @@
 #!/bin/sh -f
 
-# this setup assuems that a passowrd is not setup on the server
+# this setup assumes that a passowrd is not setup on the server
 # if one is; then will need to pass it to $MYSQL_HOME/bin/mysql as -p $password
 # if one is not set up it would have to be removed
 
-ROOT=.
+ROOT=${PWD}
 DB=OHDSI
 if [ $# -ne 5 ]; then echo "         Usage:                                                          " 
-                      echo "         ./ohdsi.sh mysql_username mysql_password mysql_password mysql_host mysql_port ohdsi_vocabularies.zip       				"
+                      echo "         ./ohdsi.sh mysql_username mysql_password mysql_host mysql_port ohdsi_vocabularies.zip       				"
                       echo "                                                                "  
-             		  echo "         ./ohdsi.sh mysql_username mysql_password mysql_password mysql_host mysql_port /path/to/ohdsi/vocabulary/archive.zip 		"
+             		  echo "         ./ohdsi.sh mysql_username mysql_password mysql_host mysql_port /path/to/ohdsi/vocabulary/archive.zip 		"
                      
    exit
 fi
@@ -23,13 +23,13 @@ PORT=$4
 FILE_NAME=$5
 
 echo "Extract files"
-# extract file name from url: umls-2017AB-full.zip
-# and extract directory name from file name: umls-2017AB-full
+# extract file name from url: umls-2018AA-full.zip
+# and extract directory name from file name: umls-2018AA-full
 #
 
 
 
-# extract unzipped directory name from file name: umls-2017AB-full
+# extract unzipped directory name from file name: umls-2018AA-full
 #
 EXTRACT_DIRECTORY=$ROOT/ohdsi
 LOG=$EXTRACT_DIRECTORY/mysql.log
@@ -99,7 +99,7 @@ SET \
 	vocabulary_id = NULLIF(@vocabulary_id,''), \
 	concept_class_id = NULLIF(@concept_class_id,''), \
 	standard_concept = NULLIF(@standard_concept,''), \
-	concept_code = NULLIF(@fil,''), \
+	concept_code = NULLIF(@concept_code,''), \
 	valid_start_date = NULLIF(@valid_start_date,''), \
 	valid_end_date = NULLIF(@valid_end_date,''), \
 	invalid_reason = NULLIF(@invalid_reason,''); \

@@ -3,7 +3,7 @@
 if [ $# -ne 7 ]; then echo "         Usage:                                                                                                            " 
                       echo "         ./umls.nlm.sh nih-username nih-password download_URL mysql_username mysql_password mysql_host mysql_port                                                          "
                       echo "                                                                                                                           "  
-		              echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip mysql_username mysql_password  mysql_host mysql_port " 
+		              echo "         ./umls.nlm.sh nih_username nih_password https://download.nlm.nih.gov/umls/kss/2018AA/umls-2018AA-full.zip mysql_username mysql_password  mysql_host mysql_port " 
 
    exit
 fi
@@ -22,7 +22,7 @@ META=META
 
 # root directory
 #
-ROOT=$(pwd)
+ROOT=${PWD}
 
 # subset configurations
 # should instead auto-generate -- revisit
@@ -37,19 +37,19 @@ sh $ROOT/umls.download.sh $1 $2 $3
 
 
 # Extract files
-# example of a url: https://download.nlm.nih.gov/umls/kss/2017AB/umls-2017AB-full.zip
+# example of a url: https://download.nlm.nih.gov/umls/kss/2018AA/umls-2018AA-full.zip
 #
 echo "Extract files"
 URL=$3
 
 
-# extract file name from url: umls-2017AB-full.zip
-# and extract directory name from file name: umls-2017AB-full
+# extract file name from url: umls-2018AA-full.zip
+# and extract directory name from file name: umls-2018AA-full
 #
 FILE_NAME="${URL##*/}"
 DIRECTORY_NAME="${FILE_NAME%.*}"
 
-# extract unzipped directory name from file name: umls-2017AB-full
+# extract unzipped directory name from file name: umls-2018AA-full
 #
 EXTRACT_DIRECTORY=$ROOT/$DIRECTORY_NAME
 

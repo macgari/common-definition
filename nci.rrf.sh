@@ -17,7 +17,7 @@ META=META
 
 # root directory
 #
-ROOT=$(pwd)
+ROOT=${PWD}
 
 # Download nci average 2.5GB, 1.5HRs
 #
@@ -28,7 +28,7 @@ sh $ROOT/nci.download.sh $1 $2
 echo "Extract files"
 FILE_NAME=$ROOT/nci.zip
 
-# extract unzipped directory name from file name: umls-2017AB-full
+# extract unzipped directory name from file name: umls-2018AA-full
 #
 EXTRACT_DIRECTORY=$ROOT/nci
 

@@ -7,7 +7,7 @@ if [ $# -ne 2 ]; then echo "  Usage:  use MSK-EVN authentication              "
    exit
 fi
 
-ROOT=$(pwd)
+ROOT=${PWD}
 EVN_DIR=$ROOT/evn
 EVN_HEADERS="Accept: text/csv"
 EVN_COOKIE=$EVN_DIR/evn_cookie
