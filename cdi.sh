@@ -11,12 +11,14 @@ NIH_USER=$nih_username
 NIH_PASS=$nih_password
 
 # Dev
-MYSQL_HOST=$mysql_tlvdpcvsdev1_host # tlvdpcvsdev1.mskcc.org
-MYSQL_PORT=$mysql_tlvdpcvsdev1_port # 3306
+MYSQL_HOME=$MYSQL_HOME                  # /path/mysql57/bin/mysql
+MYSQL_HOST=$mysql_tlvdpcvsdev1_host     # tlvdpcvsdev1.mskcc.org
+MYSQL_PORT=$mysql_tlvdpcvsdev1_port     # 3306
 MYSQL_USER=$mysql_tlvdpcvsdev1_username # cvsuser
 MYSQL_PASS=$mysql_tlvdpcvsdev1_password # *******
 
 # Local
+# MYSQL_HOME=$MYSQL_HOME
 # MYSQL_HOST=localhost
 # MYSQL_PORT=3306
 # MYSQL_USER=root
@@ -60,6 +62,12 @@ echo "Processing EVN..."
 sh evn.sh $EVN_USERNAME $EVN_PASSWORD $MYSQL_USER $MYSQL_PASS $MYSQL_HOST $MYSQL_PORT &
 
 wait
+
+
+#######################################  TEMPORARY  SOLUTION ######################################################################################
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT < cdi_ohdsi_to_umls.sql >> mysql.log 2>&1       # 
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT < evn_oncotree.sql >>      mysql.log 2>&1       # 
+#######################################  END OF TEMPORARY SOLUTION ################################################################################
 
 
 ##### Transformation process

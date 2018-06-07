@@ -1,16 +1,15 @@
-﻿## Common Definitions ETL Utility 
+## Common Definitions ETL Utility 
 
 
 ### Overview
-This pipeline gathers medical concepts, vocabularies, and terminologies from multiple sources. 
-One of the main sources is NIH where concepts come from UMLS and NCI. 
-NIH provides data in ths form of binary (files.nlm) files. 
-Then NIH provides a system called Metamorphysis which extracts and subsets data into a psv files (files.rrf). 
-MetaMorphysis also provides sql scripts to help uploading RRFs (Rich Release Format) to a MySQL server instance.
+
+This pipeline gathers medical concepts, vocabularies, and terminologies from multiple sources. The main sources is UMLS and other sources (NCI. OHDSI, MSK ONCOTREE) are imported as crosswalks to UMLS.
+UMLS provides data in the form of binary (files.nlm) files along with a tool called Metamorphysis which extracts and filters subsets of data into Pipe-Separated-Value files of (Rich Release Format aka rrf) extention (files.rrf). MetaMorphysis also provides sql scripts to help uploading RRFs to a MySQL server instance.
 The typical etl cycle for umls is: umls.nlm -> umls-subset.rrf -> MySQL UMLS database.
-The typical etl cycle for nci is: umls.rrf -> (optional) nci.rrf -> MySQL NCI database.
-Notice the difference in sources where UMLS provides sources ans .nlm while NCI provides sources as .rrf. 
-Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) files as a source, therefore subsetting is not accomplished during load, however it could be accomplished when querying the nci database.   
+The typical etl cycle for nci is: nci.rrf -> MySQL NCI database.
+Notice the difference; UMLS provides sources as .nlm while NCI provides sources as .rrf.
+Due to limitation in design of MetaMorphysis tool, it only accepts (.nlm) files as a source, therefore subsetting is not accomplished during load, however it could be accomplished when querying the nci database i.e;  
+```select * from mrconso where sab in ('fda','snomed','loinc'); ``` 
 
 
 ### Sources 
@@ -37,9 +36,6 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
    - nih.sql.sh
 
  - ohdsi.sh -- Extracts ohdsi concepts from a manually downloaded archive
-   - ohdsi.db.sh
-   - ohdsi.indexes.sh
-   - ohdsi.constraints.sh _disabled due to errors and its insignificance_
 
  - evn.sh  -- Downloads and Extracts umls concepts from mskcc intranet
    - evn.download.sh
@@ -60,7 +56,11 @@ Due to limitation in design of MetaMorphysis utility, it only accepts (.nlm) fil
   - sh evn.sh evn_username evn_password mysql_username mysql_password mysql_host mysql_port
   - sh trans.sh mysql_username mysql_password mysql_host mysql_port trans
   - sh load.sh trans/trans.json
-
+- Two manual tables are needed for the pipeline to run. 
+  
+  - The first table is called ohdsi_to_umls and is loaded in a database called cdi. cdi database should be created if not already created. In the cdi.sh script, under "TEMPORARY SOLUTION", the script execute a sql file called cdi_ohdsi_to_umls.sql to create abd populate the database and its tabke. When moving to production this step should be ignored.
+  
+  - The second table is called oncotree and is created in the evn database. In the cdi.sh script, under "TEMPORARY SOLUTION", the script executes a sql file called evn_oncotree.sql which creates and populates the table with data. Onctree table is created until we figure out the correct sources and mapping from MSK evn.   
 
 ### Notes on Configuration
 
