@@ -41,13 +41,14 @@
 # {step: "Dedupe, index, rollup, index semtype                      ", rows: 000,    time: 1  min}
 # {step: "Dedupe, index, rollup, index semrel                       ", rows: 000,    time: 4  min}
 # {step: "Dedupe, index, rollup, index dynrel                       ", rows: 000,    time: 5  min}
-# {step: "Dedupe, index, rollup, index parent               ", rows: 000,    time: 1  min}
+# {step: "Dedupe, index, rollup, index parent                       ", rows: 000,    time: 1  min}
 # {step: "Dedupe, index, rollup, index child                        ", rows: 000,    time: 1  min}
 # {step: "Dedupe, index, rollup, index crosswalk                    ", rows: 000,    time: 3  min}
 
-# {step: "Indexing rfs                                     ", rows: 000,    time: 2  min}
+# {step: "Indexing rfs                                              ", rows: 000,    time: 2  min}
 # {step: "Rollup attributes as k,v by concept export json documents ", rows: 000,    time: 4  min}
-# {                                                                                      : 1:26 h}
+
+# {total                                                                                 : 1:26 h}
 
 
 
@@ -58,10 +59,10 @@ fi
 
 ROOT=${PWD}
 MYSQL_HOME=$MYSQL_HOME
-USER=$1
-PASS=$2
-HOST=$3
-PORT=$4
+HOST=$1
+PORT=$2
+USER=$3
+PASS=$4
 DB=$5
 
 EXTRACT_DIRECTORY=$ROOT/$DB
@@ -69,6 +70,8 @@ LOG=$EXTRACT_DIRECTORY/$DB.log
 CONCEPTS_FILE=$EXTRACT_DIRECTORY/$DB.json
 rm -rf $EXTRACT_DIRECTORY
 mkdir $EXTRACT_DIRECTORY
+
+echo "Begin transformation process, check progress at $LOG"
 
 # Create a database where all transformation occure
 echo "Create ${DB} database... `/bin/date`" >> $LOG 2>&1
@@ -193,7 +196,7 @@ $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.evn_cw; \
 create table ${DB}.evn_cw as ( \
 select distinct \
- concept_id as cui, \
+    msk_id as cui, \
     prefLabel as str, \
     'ONCOTREE' as sab, \
     altLabel as code \
@@ -478,7 +481,7 @@ if [[ $? -ne 0 ]] ; then
 fi 
 
 
-### EVN/ONCOTREE source id 4  TO BE >>>>>>>>>>>>> REVISTED <<<<<<<<<<<<<
+### EVN/ONCOTREE source id 4
 # Collect crosswalk -- Concepts  from EVN/ONCOTREE source_id = 4
 # stats:  { env: local, records:~ 600, elapsed:~ 1 sec}
 echo "Collect crosswalk from EVN/ONCOTREE into crosswalk table... `/bin/date`" >> $LOG 2>&1
@@ -559,7 +562,7 @@ fi
 # Dedupe preflabel in preflabel_unq and index it, then
 # rollup in preflabel_rf and index it, finnally collect in concept_rfs
 echo "Dedupe preflabel in preflabel_unq and index it, then \
-rollup in preflabel_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in preflabel_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.preflabel_unq; \
 create table ${DB}.preflabel_unq as \
@@ -604,7 +607,7 @@ fi
 # Dedupe altlabel in altlabel_unq and index it, then
 # rollup in altlabel_rf and index, finnally collect in concept_rfs
 echo "Dedupe altlabel in altlabel_unq and index it, then \
-rollup in altlabel_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in altlabel_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.altlabel_unq; \
 create table ${DB}.altlabel_unq as \
@@ -653,7 +656,7 @@ fi
 # Dedupe semtype in semtype_unq and index it, then
 # rollup in semtype_rf and index, finnally collect in concept_rfs
 echo "Dedupe semtype in semtype_unq and index it, then \
-rollup in semtype_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in semtype_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.semtype_unq; \
 create table ${DB}.semtype_unq as \
@@ -696,7 +699,7 @@ fi
 # Dedupe semrel in semrel_unq and index it, then
 # rollup in semrel_rf and index, finnally collect in concept_rfs
 echo "Dedupe semrel in semrel_unq and index it, then \
-rollup in semrel_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in semrel_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.semrel_unq; \
 create table ${DB}.semrel_unq as \
@@ -741,7 +744,7 @@ fi
 # Dedupe dynrel in dynrel_unq and index it, then
 # rollup in dynrel_rf and index, finnally collect in concept_rfs
 echo "Dedupe dynrel in dynrel_unq and index it, then \
-rollup in dynrel_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in dynrel_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.dynrel_unq; \
 create table ${DB}.dynrel_unq as \
@@ -791,7 +794,7 @@ fi
 # Dedupe parent in parent_unq and index it, then
 # rollup in parent_rf and index, finnally collect in concept_rfs
 echo "Dedupe parent in parent_unq and index it, then \
-rollup in parent_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in parent_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.parent_unq; \
 create table ${DB}.parent_unq as \
@@ -835,7 +838,7 @@ fi
 # Dedupe child in child_unq and index it, then
 # rollup in child_rf and index, finnally collect in concept_rfs
 echo "Dedupe child in child_unq and index it, then \
-rollup in child_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in child_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.child_unq; \
 create table ${DB}.child_unq as \
@@ -878,7 +881,7 @@ fi
 # Dedupe crosswalk in crosswalk_unq and index it, then
 # rollup in crosswalk_rf and index, finnally collect in concept_rfs
 echo "Dedupe crosswalk in crosswalk_unq and index it, then \
-rollup in crosswalk_rf and index`/bin/date`" >> $LOG 2>&1
+rollup in crosswalk_rf and index `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT  -e " \
 drop table if exists ${DB}.crosswalk_unq; \
 create table ${DB}.crosswalk_unq as \

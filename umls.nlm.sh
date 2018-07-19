@@ -33,7 +33,7 @@ CONFIG_FILE=$ROOT/umls.nlm.cfg
 # Download umls average 4.5GB, 5HRs
 #
 echo "Download umls, average size and time: 4.5GB, 5HRs respectively" 
-sh $ROOT/umls.download.sh $1 $2 $3 
+sh $ROOT/umls.download.sh $1 $2 $3
 
 
 # Extract files
@@ -105,4 +105,4 @@ sh $ROOT/nih.sql.sh $META_DIRECTORY umls $4 $5 $6 $7
 
 cat $META_DIRECTORY/mysql.log
 
-echo "Elapsed: " $(($(date -u +%s)-$START)) " Seconds"
+echo "UMLS Extract, elapsed: " $(($(date -u +%s)-$START)) " Seconds"

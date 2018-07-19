@@ -38,10 +38,10 @@ nonce=`grep "execution" login | awk -F"\"" '{print $6}'`
 curl -s -A $BROWSER_USER_AGENT -b $COOKIE_FILE -H Connection:keep-alive -H Expect: -H Accept-Language:en-us -H Referer:$CAS_LOGIN_URL -d "service=$DOWNLOAD_URL&username=$NIH_USERNAME&password=$NIH_PASSWORD&_eventId=submit&submit=LOGIN&execution=$nonce" --cacert $NLM_CACERT -k -c $COOKIE_FILE  -O $CAS_LOGIN_URL 
 
 echo 'Now get the download'
-curl -L -A $BROWSER_USER_AGENT -H Connection:keep-alive -H Expect: -H Accept-Language:en-us --cacert $NLM_CACERT -k -b $COOKIE_FILE -O $DOWNLOAD_URL
+curl -L -A $BROWSER_USER_AGENT -H Connection:keep-alive -H Expect: -H Accept-Language:en-us --cacert $NLM_CACERT -k -b $COOKIE_FILE -O $DOWNLOAD_URL  --silent --output
 
 echo "Now log out.."
-curl -s -L -A $BROWSER_USER_AGENT -H Connection:keep-alive -H Expect: -H Accept-Language:en-us --cacert $NLM_CACERT -k -b $COOKIE_FILE $CAS_LOGOUT_URL > logout
+curl -s -L -A $BROWSER_USER_AGENT -H Connection:keep-alive -H Expect: -H Accept-Language:en-us --cacert $NLM_CACERT -k -b $COOKIE_FILE $CAS_LOGOUT_URL  --silent --output > logout
 
 echo "cleaning up .."
 if [ -f login ]; then

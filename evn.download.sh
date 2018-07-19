@@ -11,9 +11,9 @@ ROOT=${PWD}
 EVN_DIR=$ROOT/evn
 EVN_HEADERS="Accept: text/csv"
 EVN_COOKIE=$EVN_DIR/evn_cookie
-EVN_URL=https://evn.mskcc.org/evn/tbl/
-EVN_JSC=https://evn.mskcc.org/evn/j_security_check
-SPRQL_URL=https://evn.mskcc.org/evn/tbl/sparql
+EVN_URL=https://evn.mskcc.org/edg/tbl/
+EVN_JSC=https://evn.mskcc.org/edg/tbl/j_security_check
+SPRQL_URL=https://evn.mskcc.org/edg/tbl/sparql
 CONCEPT_TABLE=$EVN_DIR/concept.csv
 MAPPING_TABLE=$EVN_DIR/mapping.csv
 QUERY_RESULT=$EVN_DIR/result
@@ -33,25 +33,26 @@ WHERE {
   }
 }"
 
-curl  $EVN_URL  -s -c $EVN_COOKIE --output /dev/null     
+curl  $EVN_URL  -s -c $EVN_COOKIE --output /dev/null
 curl  $EVN_JSC -s -L -b $EVN_COOKIE -c $EVN_COOKIE  --data "j_username=$EVN_USERNAME&j_password=$EVN_PASSWORD&login=LOGIN" --output /dev/null
 LATEST_GRAPH=$(echo $(curl $SPRQL_URL -s -b $EVN_COOKIE -H "$EVN_HEADERS" --data "query=$LATEST_GRAPH_QUERY") |  tr -d '\r' | cut -d ' ' -f2)
-
 CONCEPT_QUERY="prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#> 
 prefix onc: <http://data.mskcc.org/ontologies/oncotree/>
-SELECT ?concept_id ?prefLabel ?altLabel  ?broader ?narrower_concept_id 
+SELECT ?concept_id ?prefLabel ?altLabel
 WHERE {
-	GRAPH <$LATEST_GRAPH> {
-		?concept_id rdf:type <http://data.mskcc.org/ontologies/oncotree/Oncotree_Concept>;
-                                    skos:prefLabel ?prefLabel;
-                                    skos:notation ?altLabel;
-                                    skos:broader ?broader.
-                ?narrower_concept_id  skos:broader ?concept_id
-	}
-}"
-
+	    GRAPH <$LATEST_GRAPH>
+            {
+                ?concept_id rdf:type <http://data.mskcc.org/ontologies/oncotree/Oncotree_Concept>;
+                                            skos:prefLabel ?prefLabel;
+                                            skos:notation ?altLabel.
+                                        OPTIONAL{?concept_id skos:broader ?broader}.
+                                        OPTIONAL{?narrower_concept_id  skos:broader ?concept_id}.
+            }
+      }
+  group by ?concept_id ?prefLabel ?altLabel
+"
 MAPPING_QUERY="prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#> 

@@ -6,29 +6,6 @@
 
 
 
-
-# Notes
-# Not every concept has a broader and a narrower 
-# Some broader concepts and narrower concepts do not resolve to an existing concept
-# example
-#
-# mysql> select * from concept where concept_id='ONC000002';
-# +------------+---------------+---------------+-----------+---------------------+
-# | concept_id | prefLabel     | altLabel      | broader   | narrower_concept_id |
-# +------------+---------------+---------------+-----------+---------------------+
-# | ONC000002  | Adrenal Gland | ADRENAL_GLAND | ONC000001 | ONC000003           |
-# +------------+---------------+---------------+-----------+---------------------+
-# 1 rows in set (0.00 sec)
-#
-# no let's find broader or narrower concept_ids  ubder concept_id 
-#
-# mysql> select * from concept where concept_id in ('ONC000001','ONC000003');
-# Empty set (0.00 sec)  <<<<<<<<<<<
-#
-# This causes lots of null values 
-
-
-
 if [ $# -ne  6 ]; then echo "         Usage:                                             						" 
                        echo "         ./evn.sh evn_username evn_password mysql_username mysql_password mysql_host mysql_port      "
                        echo "                                                            					"  
@@ -87,9 +64,7 @@ DROP TABLE IF EXISTS concept; \
 CREATE TABLE concept ( \
 	concept_id 			VARCHAR(25)  NULL, \
 	prefLabel 			VARCHAR(255) NULL, \
-	altLabel	   		VARCHAR(255) NULL, \
-	broader 			VARCHAR(25)  NULL, \
-	narrower_concept_id VARCHAR(25)  NULL);\
+	altLabel	   		VARCHAR(255) NULL);\
 show warnings \
 " >> $LOG 2>&1
 if [ $? -ne 0 ]; then ef=1; fi	
@@ -99,13 +74,11 @@ echo "finished creating  concept table... `/bin/date`" >> $LOG 2>&1
 echo "    Loading concept table  ... `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv --local-infile -u $USER -p$PASS  -h$HOST -P$PORT -D${DB} -e " \
 load data local infile '${EXTRACT_DIRECTORY}/concept.csv' into table concept FIELDS TERMINATED BY  ','ESCAPED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES \
-(@concept_id,@prefLabel,@altLabel,@broader,@narrower_concept_id) \
+(@concept_id,@prefLabel,@altLabel) \
 SET \
-	concept_id = NULLIF(@concept_id,''), \
-	prefLabel = NULLIF(@prefLabel,''), \
-	altLabel = NULLIF(@altLabel,''), \
-	broader = NULLIF(@broader,''), \
-	narrower_concept_id = NULLIF(@narrower_concept_id,''); \
+	concept_id = trim(NULLIF(@concept_id,'')), \
+	prefLabel = trim(NULLIF(@prefLabel,'')), \
+	altLabel = trim(NULLIF(@altLabel,'')); \
 show warnings \
 " >> $LOG 2>&1
 if [ $? -ne 0 ]; then ef=1; fi	
@@ -116,13 +89,11 @@ $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT -D${DB} -e " \
 CREATE INDEX idx_concept_id  ON concept  (concept_id ASC); \
 CREATE INDEX idx_prefLabel ON concept (prefLabel ASC); \
 CREATE INDEX idx_altLabel ON concept (altLabel ASC); \
-CREATE INDEX idx_broader ON concept (broader ASC); \
-CREATE INDEX idx_narrower_concept_id ON concept (narrower_concept_id ASC); \
 " >> $LOG 2>&1
 if [ $? -ne 0 ]; then ef=1; fi	
 echo "finished indexing concept table ... `/bin/date`" >> $LOG 2>&1
 
-#### NO ACCESS TO MAPPING DATASET YET
+
 
 #Creating mapping(msk_id,oncotree_id)
 echo "    Create mapping table  ... `/bin/date`" >> $LOG 2>&1
@@ -158,58 +129,32 @@ CREATE INDEX idx_oncotree_id ON mapping (oncotree_id ASC); \
 if [ $? -ne 0 ]; then ef=1; fi	
 echo "finished indexing  mapping table ... `/bin/date`" >> $LOG 2>&1
 
-echo "    Create concept_meta  ... `/bin/date`" >> $LOG 2>&1
+echo "    Create oncotree  ... `/bin/date`" >> $LOG 2>&1
 $MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT -D${DB} -e " \
-DROP TABLE IF EXISTS concept_meta; \
-create table concept_meta as \
+DROP TABLE IF EXISTS oncotree; \
+create table oncotree as \
 ( \
 select distinct \
-	 concept_id \
-	,msk_id \
+	 msk_id \
 	,prefLabel \
 	,altLabel \
 from \
 	concept \
-		left join \
+		inner join \
 			mapping \
 		on \
 			concept.concept_id = mapping.oncotree_id \
+where \
+    msk_id is not null \
 order by \
-		 concept_id \
-        ,msk_id \
+         msk_id \
 		,prefLabel \
 		,altLabel \
 ); \
 " >> $LOG 2>&1
 if [ $? -ne 0 ]; then ef=1; fi	
-echo "finished creating  concept_meta table ... `/bin/date`" >> $LOG 2>&1
+echo "finished creating  oncotree table ... `/bin/date`" >> $LOG 2>&1
 
-
-echo "    Joining concept to mapping  ... `/bin/date`" >> $LOG 2>&1
-$MYSQL_HOME/bin/mysql -vvv -u $USER -p$PASS  -h$HOST -P$PORT -D ${DB} -e " \
-drop table if exists concept_mapping; \
-create table \
-	concept_mapping \
-( \
-		select \
-			 mapping.msk_id as concept_id \
-			,concept.prefLabel \
-			,concept.altLabel \
-            ,narrower.msk_id as narrower_concept_id \
-            ,narrower.prefLabel  as narrower_prefLabel \
-            ,narrower.altLabel as narrower_altLabel \
-            ,broader.msk_id as broader_Concept_id \
-            ,broader.prefLabel as borader_prefLabel \
-            ,broader.altLabel as borader_altLabel \
-		from \
-			concept \
-			left join mapping on concept.concept_id = mapping.oncotree_id \
-			left join concept_meta as narrower on concept.narrower_concept_id = narrower.concept_id \
-			left join concept_meta  as broader on concept.broader = broader.concept_id \
-); \
-" >> $LOG 2>&1
-if [ $? -ne 0 ]; then ef=1; fi	
-echo "finished joining concept to mapping ... `/bin/date`" >> $LOG 2>&1
 
 echo "----------------------------------------" >> $LOG 2>&1
 if [ $ef -eq 1 ]

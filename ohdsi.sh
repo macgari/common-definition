@@ -121,7 +121,12 @@ if [ $? -ne 0 ]; then ef=1; fi
 echo "finished indexing  table(s) ... `/bin/date`" >> $LOG 2>&1
 
 
+echo "OHDSI manual mapping, needs to be updated"
+$MYSQL_HOME/bin/mysql -vvv --local-infile -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT < cdi_ohdsi_to_umls.sql >> mysql.log 2>&1
+echo "finished creating and loading ohdsi manual mapping table  ... `/bin/date`" >> $LOG 2>&1
+
 echo "----------------------------------------" >> $LOG 2>&1
+
 if [ $ef -eq 1 ]
 then
   echo "There were one or more errors." >> $LOG 2>&1

@@ -61,5 +61,5 @@ sh $ROOT/nih.sql.sh $META_DIRECTORY nci $3 $4 $5 $6
 
 cat $META_DIRECTORY/mysql.log
 
-echo "Elapsed: " $(($(date -u +%s)-$START)) " Seconds"
+echo "NCI Extract Elapsed: " $(($(date -u +%s)-$START)) " Seconds"
 
