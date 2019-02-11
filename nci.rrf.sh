@@ -1,7 +1,7 @@
 #!/bin/sh -f
 
 if [ $# -ne 6 ]; then echo "         Usage:                                                                                                            " 
-                      echo "         ./nci.rrf.sh nih-username nih-password mysql_username mysql_password  mysql_password mysql_host mysql_port                                                             "
+                      echo "         ./nci.rrf.sh nih-username nih-password mysql_username mysql_password mysql_host mysql_port                                                             "
    exit
 fi
 
@@ -28,7 +28,7 @@ sh $ROOT/nci.download.sh $1 $2
 echo "Extract files"
 FILE_NAME=$ROOT/nci.zip
 
-# extract unzipped directory name from file name: umls-2018AA-full
+# extract unzipped directory name from file 
 #
 EXTRACT_DIRECTORY=$ROOT/nci
 
@@ -43,16 +43,30 @@ tar xzf $FILE_NAME --directory $EXTRACT_DIRECTORY
 #
 META_DIRECTORY=$EXTRACT_DIRECTORY/$META
 RELEASE=$(grep umls.release.name= $EXTRACT_DIRECTORY/release.dat | cut -d'=' -f2)
-MYSQL_TABLES=$EXTRACT_DIRECTORY/config/$RELEASE/DB_RRF/Mysql5.5/mysql_tables.sql
-MYSQL_INDEXES=$EXTRACT_DIRECTORY/config/$RELEASE/DB_RRF/Mysql5.5/mysql_indexes.sql
+MYSQL_VERSION=$(grep -i mysql $EXTRACT_DIRECTORY/config/$RELEASE/DB_RRF/db.txt)
+MYSQL_DIR=$EXTRACT_DIRECTORY/config/$RELEASE/DB_RRF/$MYSQL_VERSION
+MYSQL_TABLES=$MYSQL_DIR/mysql_tables.sql
+MYSQL_INDEXES=$MYSQL_DIR/mysql_indexes.sql
 	
 # Depending on OS adjust sql files line delimiter i.e: oxs \n vs \r\n
 #
 OSX_SED="s/\\\r\\\n/\\\n/g"
 NCI_CRLF_SED="s/@LINE_TERMINATION@/'\\\n'/g"
 NCI_VARCHAR_50_SED="s/varchar(50)/varchar(1024)/g"
-sed -e $OSX_SED -e $NCI_CRLF_SED -e $NCI_VARCHAR_50_SED $MYSQL_TABLES > $META_DIRECTORY/mysql_tables_os.sql
+RANK="s/[[:<:]]RANK[[:>:]]/\`RANK\`/g"
+
+sed -e $OSX_SED -e $NCI_CRLF_SED -e $NCI_VARCHAR_50_SED -e $RANK $MYSQL_TABLES > $META_DIRECTORY/mysql_tables_os.sql
 cp $MYSQL_INDEXES $META_DIRECTORY/mysql_indexes_os.sql
+
+# Folks in NCI did not include other languages RRFs for MRXW_*
+# but meanwhile left the sql statements to fail
+# We needed to remove all MRXW_* sql statements except for MRXW_ENG
+# since OSX sed has its own regex mind, hndle change in python 
+#LANGS='s/(load|DROP|CREATE).*MRXW_((?!ENG)([A-Z]{3}))(.*\n)*.*;//g'
+python nci.rrf.py $META_DIRECTORY/mysql_tables_os.sql
+python nci.rrf.py $META_DIRECTORY/mysql_indexes_os.sql
+
+
 
 # Load RRF files into MySQL
 #
